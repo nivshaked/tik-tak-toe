@@ -27,10 +27,10 @@ const checkEqual = (one, two, three) => {
 let turnNumber = 0;
 // TODO: check diagonal smarter?
 const checkWinner = (player, row, column) => {
-    if (checkEqual(BOARD[row][0], BOARD[row][1], BOARD[row][2]) ||
+    if (turnNumber > 4 && checkEqual(BOARD[row][0], BOARD[row][1], BOARD[row][2]) ||
         checkEqual(BOARD[0][column], BOARD[1][column], BOARD[2][column]) ||
-        (turnNumber > 4 && checkEqual(BOARD[0][0], BOARD[1][1], BOARD[2][2]) ||
-            checkEqual(BOARD[0][2], BOARD[1][1], BOARD[2][0]))) {
+        checkEqual(BOARD[0][0], BOARD[1][1], BOARD[2][2]) ||
+        checkEqual(BOARD[0][2], BOARD[1][1], BOARD[2][0])) {
         printBoard();
         console.log(`\n${player} IS THE WINNER!\n\n`);
         return PLOT_STATUS.result;
@@ -44,7 +44,7 @@ const checkWinner = (player, row, column) => {
 };
 const insertToBoard = (insert, player) => {
     if (insert < 0 || insert > 8) {
-        console.log("\npleas choose only numbers between 1 - 9\n");
+        console.log("\nPlease choose only numbers between 1 - 9\n");
         return PLOT_STATUS.blocked;
     }
     const row = Math.floor(insert / 3);
@@ -55,7 +55,7 @@ const insertToBoard = (insert, player) => {
         return checkWinner(player, row, column);
     }
     else {
-        console.log("\nthis spot is already chosen\n");
+        console.log("\nThis spot is already chosen\n");
         return PLOT_STATUS.blocked;
     }
 };
