@@ -66,8 +66,7 @@ const printBoard = () => {
             process.stdout.write("   " + BOARD[row][column] + ((column + 1) % 3 > 0 ? "   |" : "   "));
         }
         // new line
-        console.log(" ");
-        row !== 2 && console.log("- - - -+- - - -+- - - -");
+        row !== 2 ? console.log("\n- - - -+- - - -+- - - -") : console.log(" ");
     }
 };
 const rl = readline.createInterface({
