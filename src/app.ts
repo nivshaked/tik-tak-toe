@@ -17,21 +17,33 @@ const PLOT_STATUS = {
     success: "success plot",
 };
 
-const getCurrentPlayer = (previous?: string) => {
-    if (!previous || previous === PLAYER.two) {
-        return PLAYER.one;
-    } else {
-        return PLAYER.two;
-    }
+let turnNumber = 0;
+
+const rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout,
+});
+
+const switchPlayer = (previous: string) => {
+    return previous === PLAYER.two ? PLAYER.one : PLAYER.two;
 };
 
 const checkEqual = (one: any, two: any, three: any) => {
     return one === two && one === three;
 };
 
-let turnNumber = 0;
-// TODO: check diagonal smarter?
-const checkWinner = (player: string, row: number, column: number) => {
+const printBoard = () => {
+    console.log("\n\n");
+    for (let row = 0; row < 3; row++) {
+        for (let column = 0; column < 3; column++) {
+            const isLastInRow = (column + 1) % 3 === 0;
+            process.stdout.write("   " + BOARD[row][column] + (isLastInRow ? "    " : "   |"));
+        }
+        console.log(row !== 2 ? "\n- - - -+- - - -+- - - -" : " ");
+    }
+};
+
+const checkForResult = (player: string, row: number, column: number) => {
     if (turnNumber > 4 && checkEqual(BOARD[row][0], BOARD[row][1], BOARD[row][2]) ||
         checkEqual(BOARD[0][column], BOARD[1][column], BOARD[2][column]) ||
         checkEqual(BOARD[0][0], BOARD[1][1], BOARD[2][2]) ||
@@ -58,43 +70,24 @@ const insertToBoard = (insert, player) => {
     if (BOARD[row][column] !== PLAYER.one && BOARD[row][column] !== PLAYER.two) {
         BOARD[row][column] = player;
         turnNumber += 1;
-        return checkWinner(player, row, column);
+        return checkForResult(player, row, column);
     } else {
         console.log("\nThis spot is already chosen\n");
         return PLOT_STATUS.blocked;
     }
 };
 
-const printBoard = () => {
-    console.log("\n\n");
-    for (let row = 0; row < 3; row++) {
-        for (let column = 0; column < 3; column++) {
-            process.stdout.write("   " + BOARD[row][column] + ((column + 1) % 3 > 0 ? "   |" : "   "));
-        }
-        // new line
-        row !== 2 ? console.log("\n- - - -+- - - -+- - - -") : console.log(" ");
-    }
-};
-
-const rl = readline.createInterface({
-    input: process.stdin,
-    output: process.stdout,
-});
-
 const newTurn = (player: string) => {
     printBoard();
     rl.question(`\n${player} Pick a spot: `, (answer) => {
         const insertStatus = insertToBoard(answer - 1, player);
-        let newPlayer = player;
         if (insertStatus === PLOT_STATUS.result) {
             rl.close();
         } else {
             // if the plot didnt success dont switch player
-            newPlayer = insertStatus === PLOT_STATUS.success ? getCurrentPlayer(player) : player;
-            newTurn(newPlayer);
+            newTurn(insertStatus === PLOT_STATUS.success ? switchPlayer(player) : player);
         }
     });
 };
 
-const firstPlayer = getCurrentPlayer();
-newTurn(firstPlayer);
+newTurn(PLAYER.one);
